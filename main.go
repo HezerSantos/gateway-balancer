@@ -6,10 +6,11 @@ import (
 	"log"
 	"fmt"
 	"io"
+	"time"
 )
 
 var urlMap = map[string][]string{
-
+	"1": {"https://api.hallowedvisions.com"},
 }
 
 type JsonError struct {
@@ -75,6 +76,17 @@ func RouteProxy (w http.ResponseWriter, r *http.Request)  {
 
 }
 
+type ResponseRecorder struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func (rr *ResponseRecorder) WriteHeader(code int) {
+	rr.statusCode = code
+	rr.ResponseWriter.WriteHeader(code)
+
+}
+
 func logginMiddleware (next http.Handler) http.Handler {
 	return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
 		scheme := "http"
@@ -83,11 +95,18 @@ func logginMiddleware (next http.Handler) http.Handler {
 			scheme = "https"
 		}
 
-		fmt.Printf("Incoming: %s%s%s\n", r.Host, scheme, r.URL.String())
-		fmt.Println(r.RequestURI)
 
-		next.ServeHTTP(w, r)
+		fmt.Printf("Request at %s:\n", time.Now().Format("02 Jan 2006 03:04PM"))
+		fmt.Printf("	Incoming: %s://%s%s\n", scheme, r.Host, r.URL.String())
+		fmt.Printf("	%s %s\n", r.Method, r.RequestURI)
 
+		start := time.Now()
+		responseRecorder := ResponseRecorder{ResponseWriter: w, statusCode: http.StatusOK}
+		next.ServeHTTP(&responseRecorder, r)
+
+		duration := time.Since(start)
+		fmt.Printf("	Status: %d %dms", responseRecorder.statusCode, duration.Milliseconds())
+		fmt.Println()
 	})
 }
 
@@ -95,6 +114,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", RouteProxy)
 	fmt.Println("Server Running on 8080")
+	fmt.Println("")
 	log.Fatal(http.ListenAndServe(":8080", logginMiddleware(mux)))
 
 }
