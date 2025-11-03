@@ -124,10 +124,7 @@ func logginMiddleware (next http.Handler) http.Handler {
 }
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error Loading .env File")
-	}
+	_ = godotenv.Load()
 	initUrlMap(urlMap)
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", RouteProxy)
