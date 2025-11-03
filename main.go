@@ -131,9 +131,9 @@ func main() {
 	initUrlMap(urlMap)
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", RouteProxy)
-	fmt.Println("Server Running on 8080")
+	fmt.Printf("Server Running on %s\n", os.Getenv("PORT"))
 	fmt.Println("")
-	log.Fatal(http.ListenAndServe(":8080", logginMiddleware(mux)))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), logginMiddleware(mux)))
 
 }
 
