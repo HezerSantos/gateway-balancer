@@ -7,11 +7,22 @@ import (
 	"fmt"
 	"io"
 	"time"
+	"github.com/joho/godotenv"
+	"os"
 )
 
-var urlMap = map[string][]string{
-	"1": {"https://api.hallowedvisions.com"},
+
+type ProjectInformation struct {
+	name string
+	urls []string
 }
+var urlMap = map[string]ProjectInformation{}
+
+func initUrlMap(urlMap map[string]ProjectInformation){
+    urlMap["1"] = ProjectInformation{"Sahntek", []string{os.Getenv("SAHNTEK")}}
+}
+
+
 
 type JsonError struct {
 	msg string
@@ -41,16 +52,15 @@ func RouteProxy (w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	serverUrl, ok := urlMap[serverId[0]]
+	serverUrlStruct, ok := urlMap[serverId[0]]
 
 	if !ok {
 		SendError(w, r, 400, JsonError{"Invalid Url", "INVALID_URL"})
 		return
 	}
 
-	baseUrl := fmt.Sprintf("%s%s", serverUrl[0], path)
+	baseUrl := fmt.Sprintf("%s%s", serverUrlStruct.urls[0], path)
 
-	
 	req, _ := http.NewRequest(r.Method, baseUrl, r.Body)
 	req.Header = r.Header
 
@@ -96,7 +106,7 @@ func logginMiddleware (next http.Handler) http.Handler {
 		}
 
 
-		fmt.Printf("Request at %s:\n", time.Now().Format("02 Jan 2006 03:04PM"))
+		fmt.Printf("Request @ %s:\n", time.Now().Format("02 Jan 2006 03:04PM"))
 		fmt.Printf("	Incoming: %s://%s%s\n", scheme, r.Host, r.URL.String())
 		fmt.Printf("	%s %s\n", r.Method, r.RequestURI)
 
@@ -104,13 +114,21 @@ func logginMiddleware (next http.Handler) http.Handler {
 		responseRecorder := ResponseRecorder{ResponseWriter: w, statusCode: http.StatusOK}
 		next.ServeHTTP(&responseRecorder, r)
 
+		serverUrlStruct := urlMap[r.Header["Server-Id"][0]]
+
 		duration := time.Since(start)
+		fmt.Printf("	Project Name: %s\n", serverUrlStruct.name)
 		fmt.Printf("	Status: %d %dms", responseRecorder.statusCode, duration.Milliseconds())
 		fmt.Println()
 	})
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error Loading .env File")
+	}
+	initUrlMap(urlMap)
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", RouteProxy)
 	fmt.Println("Server Running on 8080")
