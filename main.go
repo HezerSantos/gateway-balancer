@@ -114,8 +114,16 @@ func logginMiddleware (next http.Handler) http.Handler {
 		responseRecorder := ResponseRecorder{ResponseWriter: w, statusCode: http.StatusOK}
 		next.ServeHTTP(&responseRecorder, r)
 
-		serverUrlStruct := urlMap[r.Header["Server-Id"][0]]
+		projectId, ok := r.Header["Server-Id"]
+		if !ok {
+			projectId = []string{"Unknown"}
+		}
 
+		serverUrlStruct, ok := urlMap[projectId[0]]
+		if !ok {
+			serverUrlStruct = ProjectInformation{"Unkown", []string{}}
+		}
+		
 		duration := time.Since(start)
 		fmt.Printf("	Project Name: %s\n", serverUrlStruct.name)
 		fmt.Printf("	Status: %d %dms", responseRecorder.statusCode, duration.Milliseconds())
