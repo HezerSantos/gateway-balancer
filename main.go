@@ -20,7 +20,7 @@ type ProjectInformation struct {
 var urlMap = map[string]ProjectInformation{}
 
 func initUrlMap(urlMap map[string]ProjectInformation){
-    urlMap["1"] = ProjectInformation{"Sahntek", []string{os.Getenv("SAHNTEK")}}
+    urlMap["HV001"] = ProjectInformation{"Sahntek", []string{os.Getenv("SAHNTEK")}}
 }
 
 
@@ -140,6 +140,7 @@ var allowedHeaders = []string{
     "Authorization", 
     "Cookie", 
     "csrfToken",
+	"Server-Id",
 }
 func main() {
 	_ = godotenv.Load()
