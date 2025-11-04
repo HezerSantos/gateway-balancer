@@ -21,6 +21,7 @@ var urlMap = map[string]ProjectInformation{}
 
 func initUrlMap(urlMap map[string]ProjectInformation){
     urlMap["HV001"] = ProjectInformation{"Sahntek", []string{os.Getenv("SAHNTEK")}}
+	urlMap["HV002"] = ProjectInformation{"Hallowed Visions", []string{os.Getenv("HV")}}
 }
 
 
@@ -136,7 +137,7 @@ func logginMiddleware (next http.Handler) http.Handler {
 	})
 }
 
-var allowedOrigins = []string{"https://sahntek.hallowedvisions.com"}
+var allowedOrigins = []string{"https://sahntek.hallowedvisions.com", "https://hallowedvisions.com"}
 
 var allowedHeaders = []string{    
 	"Content-Type", 
