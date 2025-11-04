@@ -132,7 +132,7 @@ func logginMiddleware (next http.Handler) http.Handler {
 	})
 }
 
-var allowedOrigins = []string{"sahntek.hallowedvisions.com"}
+var allowedOrigins = []string{"https://sahntek.hallowedvisions.com"}
 
 var allowedHeaders = []string{    
 	"Content-Type", 
