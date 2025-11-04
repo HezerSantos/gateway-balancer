@@ -75,6 +75,9 @@ func RouteProxy (w http.ResponseWriter, r *http.Request)  {
 	defer resp.Body.Close()
 
 	for header, values := range resp.Header {
+		if header == "Access-Control-Allow-Origin" {
+            continue
+        }
 		for _, subValue := range values {
 			w.Header().Add(header, subValue)
 		}
