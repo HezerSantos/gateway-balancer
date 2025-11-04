@@ -8,6 +8,7 @@ import (
 	"io"
 	"time"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 	"os"
 )
 
@@ -131,14 +132,29 @@ func logginMiddleware (next http.Handler) http.Handler {
 	})
 }
 
+var allowedOrigins = []string{"sahntek.hallowedvisions.com"}
+
+var allowedHeaders = []string{    
+	"Content-Type", 
+    "Authorization", 
+    "Cookie", 
+    "csrfToken",
+}
 func main() {
 	_ = godotenv.Load()
 	initUrlMap(urlMap)
+
+	c := cors.New(cors.Options{
+		AllowedOrigins: allowedOrigins,
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
+		AllowedHeaders: allowedHeaders,
+		AllowCredentials: true,
+	})
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", RouteProxy)
 	fmt.Printf("Server Running on %s\n", os.Getenv("PORT"))
 	fmt.Println("")
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), logginMiddleware(mux)))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), c.Handler(logginMiddleware(mux))))
 
 }
 
