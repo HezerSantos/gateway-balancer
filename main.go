@@ -22,6 +22,7 @@ var urlMap = map[string]ProjectInformation{}
 func initUrlMap(urlMap map[string]ProjectInformation){
     urlMap["HV001"] = ProjectInformation{"Sahntek", []string{os.Getenv("SAHNTEK")}}
 	urlMap["HV002"] = ProjectInformation{"Hallowed Visions", []string{os.Getenv("HV")}}
+	urlMap["HV003"] = ProjectInformation{"Alzher", []string{os.Getenv("ALZHER")}}
 }
 
 
