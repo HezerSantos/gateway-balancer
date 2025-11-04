@@ -108,7 +108,8 @@ func logginMiddleware (next http.Handler) http.Handler {
 
 
 		fmt.Printf("Request @ %s:\n", time.Now().Format("02 Jan 2006 03:04PM"))
-		fmt.Printf("	Incoming: %s://%s%s\n", scheme, r.Host, r.URL.String())
+		fmt.Printf("	Request Url: %s://%s%s\n", scheme, r.Host, r.URL.String())
+		fmt.Printf("	From: %s\n", r.Header.Get("Origin"))
 		fmt.Printf("	%s %s\n", r.Method, r.RequestURI)
 
 		start := time.Now()
